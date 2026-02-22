@@ -6,12 +6,25 @@
 trigger:
   - none
 
+parameters:
+- name: variable1
+  type: string
+  default: ''
+- name: variable2
+  type: string
+  default: ''
+
 pool:
   name: "Default"
 
 steps:
   - script: echo Hello, world!
     displayName: "Run a one-line script"
+
+  - script: |
+      echo "Value of variable 1 is: ${{ parameters.variable1 }}"
+      echo "Value of variable 2 is: ${{ parameters.variable2 }}"
+    displayName: 'Display Passed Variables'
 
   - script: |
       echo Add other tasks to build, test, and deploy your project.
