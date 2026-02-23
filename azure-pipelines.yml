@@ -6,20 +6,14 @@
 trigger:
   - none
 
-parameters:
-- name: azure_pipeline_variables # שם הפרמטר שמכיל את ה-JSON
-  type: string
-  default: '{}'
-
 pool:
   name: "Default"
 
 steps:
-- powershell: |
-    # הפיכת מחרוזת ה-JSON לאובייקט PowerShell
-    $jsonObj = '${{ parameters.azure_pipeline_variables }}' | ConvertFrom-Json
-    
-    # הדפסת הערכים מתוך האובייקט
-    Write-Host "Value of variable 1 is: $($jsonObj.variable1)"
-    Write-Host "Value of variable 2 is: $($jsonObj.variable2)"
-  displayName: 'Parse and Display JSON'
+  - script: echo Hello, world!
+    displayName: "Run a one-line script"
+
+  - script: |
+      echo Add other tasks to build, test, and deploy your project.
+      echo See https://aka.ms/yaml
+    displayName: "Run a multi-line script"
