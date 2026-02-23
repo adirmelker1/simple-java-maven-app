@@ -18,7 +18,7 @@ steps:
   - task: Docker@2
     inputs:
       containerRegistry: 'Docker Hub'
-      repository: 'aaa'
+      repository: 'adir395/my-app'
       command: 'buildAndPush'
       Dockerfile: '**/Dockerfile'
   - script: |
