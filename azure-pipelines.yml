@@ -22,6 +22,9 @@ steps:
       command: 'buildAndPush'
       Dockerfile: '**/Dockerfile'
   - script: |
-      echo Add other tasks to build, test, and deploy your project.
-      echo See https://aka.ms/yaml
-    displayName: "Run a multi-line script"
+      docker pull adir395/my-app:latest
+      docker run -d --name test-container -p 8080:8080 adir395/my-app:latest
+      sleep 10
+      docker logs test-container
+      docker ps      
+    displayName: "Docker Download and run"
