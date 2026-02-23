@@ -63,14 +63,18 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/my-app:latest
 
-      - name: Pull and Run locally for testing
-        run: |
-          docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-          docker run -d --name test-container -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/my-app:latest
-          sleep 10
-          docker logs test-container
-          docker ps
-      #
+      # - name: Pull and Run locally for testing
+      #   run: |
+      #     docker pull ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+      #     docker run -d --name test-container -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+      #     sleep 10
+      #     docker logs test-container
+      #     docker ps
+
+  trigger-azure-pipeline:
+    needs: deploy-docker
+    runs-on: ubuntu-latest
+    steps:
       - name: trigger azure devops pipeline
         uses: Azure/pipelines@v1
         with:
