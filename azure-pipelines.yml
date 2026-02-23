@@ -24,7 +24,7 @@ steps:
   - script: |
       docker pull adir395/my-app:latest
       docker run -d --name test-container -p 8080:8080 adir395/my-app:latest
-      sleep 10
+      timeout /t 10 /nobreak
       docker logs test-container
       docker ps      
     displayName: "Docker Download and run"
