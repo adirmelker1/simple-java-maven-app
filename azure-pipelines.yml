@@ -1,9 +1,4 @@
-# Starter pipeline
-
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
+# Starter pipeline for Windows-based Agent
 trigger:
   - none
 pr:
@@ -26,39 +21,38 @@ jobs:
   - job: DeployAndVerify
     displayName: "Deploy to Production"
     steps:
-      # 1. התחברות מאובטחת ל-Azure Container Registry
-      # השלב הזה משתמש ב-Service Connection שיצרת ב-Project Settings
+      # 1. התחברות ל-Azure Container Registry
       - task: Docker@2
         displayName: "Login to ACR"
         inputs:
           containerRegistry: "$(service_connection)"
           command: "login"
 
+      # 2. פריסת הקונטיינר בתחביר שמתאים ל-Windows CMD
       - script: |
           echo "Cleaning old container..."
-          docker stop $(image_name) || true
-          docker rm $(image_name) || true
+          :: השתקת שגיאות ב-Windows במידה והקונטיינר לא קיים
+          docker stop $(image_name) >nul 2>&1
+          docker rm $(image_name) >nul 2>&1
 
           echo "Pulling latest image..."
-          docker pull $(acr_server)/$(image_name):latest
+          docker pull $(acr_server)/$(image_name):$(IMAGE_TAG)
 
           echo "Starting new container..."
-          docker run -d \
-            --name $(image_name)\
-            -p 8080:8080 \
-            $(acr_server)/$(image_name):latest
+          :: שימוש ב-^ להמשך שורה ב-Windows
+          docker run -d ^
+            --name $(image_name) ^
+            -p 8080:8080 ^
+            $(acr_server)/$(image_name):$(IMAGE_TAG)
         displayName: "Deploy Docker Container"
 
-      # 3. הצגת פלט האפליקציה (Application Logs)
-      # זהו השלב שביקשת - הוא מדפיס את מה שהאפליקציה כותבת ל-Console
+      # 3. הצגת פלט האפליקציה (Logs)
       - script: |
+          echo "Waiting 5 seconds for application to start..."
+          timeout /t 5 /nobreak >nul
           echo "--- Application Output (Logs) ---"
           docker logs $(image_name)
           echo "---------------------------------"
-        displayName: "Fetch Application Logs"
-
-        # timeout /t 10 /nobreak
-
-        # displayName: "Pull and Run Docker Container with Specific Tag"
-        #   docker logs test-container
-        #   docker ps
+          echo "Current status:"
+          docker ps --filter "name=$(image_name)"
+        displayName: "Fetch Application Logs and Status"
