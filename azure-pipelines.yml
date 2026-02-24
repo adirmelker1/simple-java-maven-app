@@ -15,22 +15,50 @@ pool:
 variables:
   - name: IMAGE_TAG
     value: "latest"
+  - name: acr_server
+    value: "adir395.azurecr.io"
+  - name: image_name
+    value: "my-app"
+  - name: service_connection
+    value: "MyACRConnection"
 
 jobs:
-  - job: DeployDockerContainer
-    displayName: Deploy Docker Container
+  - job: DeployAndVerify
+    displayName: "Deploy to Production"
     steps:
+      # 1. התחברות מאובטחת ל-Azure Container Registry
+      # השלב הזה משתמש ב-Service Connection שיצרת ב-Project Settings
+      - task: Docker@2
+        displayName: "Login to ACR"
+        inputs:
+          containerRegistry: "$(service_connection)"
+          command: "login"
+
       - script: |
-          echo "Deploying version: $(IMAGE_TAG)"
+          echo "Cleaning old container..."
+          docker stop $(image_name)-container || true
+          docker rm $(image_name)-container || true
 
-          docker pull adir395/my-app:$(IMAGE_TAG)
+          echo "Pulling latest image..."
+          docker pull $(acr_server)/$(image_name):latest
 
-          docker stop test-container || true
-          docker rm test-container || true
+          echo "Starting new container..."
+          docker run -d \
+            --name $(image_name)-container \
+            -p 8080:8080 \
+            $(acr_server)/$(image_name):latest
+        displayName: "Deploy Docker Container"
 
-          docker run -d --name test-container -p 8080:8080 adir395/my-app:$(IMAGE_TAG)
+      # 3. הצגת פלט האפליקציה (Application Logs)
+      # זהו השלב שביקשת - הוא מדפיס את מה שהאפליקציה כותבת ל-Console
+      - script: |
+          echo "--- Application Output (Logs) ---"
+          docker logs $(image_name)-container
+          echo "---------------------------------"
+        displayName: "Fetch Application Logs"
 
-          timeout /t 10 /nobreak
-          docker logs test-container
-          docker ps
-        displayName: "Pull and Run Docker Container with Specific Tag"
+        # timeout /t 10 /nobreak
+
+        # displayName: "Pull and Run Docker Container with Specific Tag"
+        #   docker logs test-container
+        #   docker ps
