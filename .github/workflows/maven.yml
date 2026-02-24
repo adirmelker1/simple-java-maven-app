@@ -61,7 +61,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/my-app:latest
+            ${{ secrets.DOCKER_USERNAME }}/my-app:${{ github.sha }}
 
       # - name: Pull and Run locally for testing
       #   run: |
@@ -74,6 +76,7 @@ jobs:
   trigger-azure-pipeline:
     needs: deploy-docker
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: trigger azure devops pipeline
         uses: Azure/pipelines@v1
@@ -81,5 +84,4 @@ jobs:
           azure-devops-project-url: "https://dev.azure.com/adirmelker1/DevOps-Basic"
           azure-pipeline-name: "adirmelker1.simple-java-maven-app" # name of the Azure pipeline to be triggered
           azure-devops-token: "${{ secrets.AZURE_DEVOPS_PROJECT }}"
-          azure-pipeline-variables: '{"variable1": "value1", "variable2": "value2"}' # optional stringified json
-
+          azure-pipeline-variables: '{"IMAGE_TAG": "${{ github.sha }}"}'
