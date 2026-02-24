@@ -20,7 +20,7 @@ variables:
   - name: image_name
     value: "my-app"
   - name: service_connection
-    value: "MyACRConnection"
+    value: "ACR"
 
 jobs:
   - job: DeployAndVerify
