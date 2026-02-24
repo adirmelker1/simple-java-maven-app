@@ -36,15 +36,15 @@ jobs:
 
       - script: |
           echo "Cleaning old container..."
-          docker stop $(image_name)-container || true
-          docker rm $(image_name)-container || true
+          docker stop $(image_name) || true
+          docker rm $(image_name) || true
 
           echo "Pulling latest image..."
           docker pull $(acr_server)/$(image_name):latest
 
           echo "Starting new container..."
           docker run -d \
-            --name $(image_name)-container \
+            --name $(image_name)\
             -p 8080:8080 \
             $(acr_server)/$(image_name):latest
         displayName: "Deploy Docker Container"
@@ -53,7 +53,7 @@ jobs:
       # זהו השלב שביקשת - הוא מדפיס את מה שהאפליקציה כותבת ל-Console
       - script: |
           echo "--- Application Output (Logs) ---"
-          docker logs $(image_name)-container
+          docker logs $(image_name)
           echo "---------------------------------"
         displayName: "Fetch Application Logs"
 
