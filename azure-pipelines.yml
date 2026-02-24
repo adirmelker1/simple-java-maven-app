@@ -16,7 +16,7 @@ variables:
   - name: IMAGE_TAG
     value: "latest"
   - name: acr_server
-    value: "adir395.azurecr.io"
+    value: "adirdevopsregistry2026.azurecr.io"
   - name: image_name
     value: "my-app"
   - name: service_connection
