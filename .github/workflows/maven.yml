@@ -72,7 +72,7 @@ jobs:
       #     sleep 10
       #     docker logs test-container
       #     docker ps
-  #
+  #test
   trigger-azure-pipeline:
     needs: deploy-docker
     runs-on: ubuntu-latest
